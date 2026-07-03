@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 密钥（勿提交）
+.env
+
+# 生成物 / 大文件
+data/*.csv
+v*/out/
+v*/submit.zip
+submit.zip
+
+# IDE
+.idea/
+.vscode/
+*.swp
