@@ -47,20 +47,20 @@ Zero/
 
 ---
 
-## 快速开始（当前最佳 v2）
+## 快速开始（当前最佳 v5）
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt   # 或用项目内 .venv
 
 # 设置 Tushare token（勿提交到 Git，见 .env.example）
-# PowerShell: $env:TUSHARE_TOKEN="你的token"
+# 已支持项目根 .env 自动读取；或 PowerShell: $env:TUSHARE_TOKEN="你的token"
 
 python shared/fetch_daily.py --start 20260608 --end 20260701 --out data/daily_hist.csv
-python v2/main_daily.py --target-date 20260701
-python shared/make_submit.py --dir v2/out --zip v2/submit.zip
+python v5/main_daily.py --target-date 20260701
+python shared/make_submit.py --dir v5/out --zip v5/submit.zip
 ```
 
-上传 `v2/submit.zip` 到天池平台。
+上传 `v5/submit.zip` 到天池平台。
 
 ---
 
@@ -84,7 +84,14 @@ python shared/make_submit.py --dir v2/out --zip v2/submit.zip
 |:---:|:---:|:---:|:---|
 | v1 | 冻结 | **0.41** | 单日规则+聚类 baseline |
 | v2 | 冻结 | **0.5433** | 强信号+截面相对+多日画像 |
-| v3 | 已评测 | **0.5311** | 弱监督分类器（未超 v2） |
+| v3 | 冻结 | **0.5311** | 弱监督分类器（未超 v2） |
+| v4 | 冻结 | **0.5690** | 多源微观结构·证据分层+跨源确认 |
+| v5 | **当前最佳** | **0.5906** | 仅改 Task1 聚类空间提纯（@0701；同代码@0702=0.5201） |
+| v6 | 冻结 | **0.5708** | capital_type 多日投票（退步，离线指标误导） |
+| v7 | 已评测 | 0.5201* | Task1 解释逐股定制化（*@0702，三方对照证实解释文本无权重） |
+| v8 | 已评测 | 0.5201* | 意图阈值重标定（*@0702，三方对照证实微改动不可见） |
+
+> ⚠️ **v5/v7/v8 在 0702 同为 0.5201（三方受控对照）**：证实①可解释性文本无可见权重；②个位数意图翻转线上贡献为0。同代码 v5 在 0701/0702 差 0.0705，行情效应 ≫ 任何单次微改动。
 
 每次上传评测后，请在 [CHANGELOG.md](CHANGELOG.md) 中更新分数。
 
@@ -106,4 +113,5 @@ python shared/make_submit.py --dir v2/out --zip v2/submit.zip
 
 - 平台 T+1 滞后：提交**平台要求的评测日**，不是今天
 - A榜每天 ≤3 次；每晚约 18 点更新前一日答案
+- ⚠️ **评测日每天滚动，跨评测日的分数不可直接比较**（不同交易日真值分布不同）。要验证一次改动的效果，须"同评测日 + 只改一处"两个条件同时满足——否则分差会被市场行情差异污染（见 v7 教训）。
 - 详细规则见 `QA.md`
