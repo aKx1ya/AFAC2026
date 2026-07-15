@@ -11,10 +11,15 @@ venv/
 # 生成物 / 大文件
 data/*.csv
 v*/out/
+v*/out_*/
 v*/submit.zip
+v*/submit*.zip
 submit.zip
+*_intent_dual.py
 
-# IDE
+# IDE / OS
 .idea/
 .vscode/
 *.swp
+.DS_Store
+Thumbs.db
