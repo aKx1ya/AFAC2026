@@ -28,8 +28,9 @@ Zero/
 │
 ├── baseline_original/    ← 官方 L2 baseline（存档）
 ├── v1/ … v8/             ← A榜迭代（v5 A榜最高 0.5906）
-├── v9/                   ← B榜基线 0.5519（公开行情）
-└── v10/                  ← B榜候选：v9 + Tushare 硬证据
+├── v9/                   ← B榜旧基线 0.5519（公开行情）
+├── v10/                  ← B榜 Task2 硬证据底座（未单独上线）
+└── v11/                  ← **B榜当前基线 0.5631**（Task1 提纯）
 ```
 
 ---
@@ -38,43 +39,43 @@ Zero/
 
 | 场景 | 推荐 | 分数 |
 |---|---|---:|
-| **B榜日常提交** | **v9** | **0.5519** @20260713 |
-| B榜下一版试投 | v10 | 本地评测优于 v9-soft，待线上验证 |
+| **B榜日常提交** | **v11** | **0.5631** @20260714 |
+| B榜上一基线 | v9 | 0.5519 @20260713 |
 | A榜历史最佳 | v5 | **0.5906** @20260701（不可直接交 B榜） |
 
 > 整迁 v5 到 B榜 = **0.3699**，禁止再整包迁移。
 
 ---
 
-## B榜快速开始（v9）
+## B榜快速开始（v11，当前基线）
 
 ```bash
 pip install -r requirements.txt
+# 复制 .env.example → .env，填入 TUSHARE_TOKEN
 
-# 用平台当日要求的股票池与 transaction_date（以报错提示为准）
-python v9/main_daily.py \
-  --stock-file 官方数据/B榜/股票样本_20260714.xlsx \
-  --target-date 20260713 \
-  --feature-date 20260713 \
-  --output v9/out
+# 1) 用【官方】当日股票池拉数（勿用 data/ 下自行另存的 xlsx）
+python shared/fetch_daily.py --start 20260608 --end 20260714 \
+  --stock-file 官方数据/B榜/股票样本_20260715.xlsx \
+  --out data/daily_hist_b_official_20260714.csv
 
-python shared/make_submit.py --dir v9/out --zip v9/submit.zip
+# 2) 推理（transaction_date 以平台为准，常为评测滞后日）
+python v11/main_daily.py \
+  --input data/daily_hist_b_official_20260714.csv \
+  --target-date 20260714 --code-style keep
+
+# 3) 打包提交
+python shared/make_submit.py --dir v11/out --zip v11/submit.zip
 ```
 
-## B榜 + Tushare（v10）
+## B榜 + Tushare 底座（v10，Task2 硬证据；未单独上线）
 
 ```bash
-# .env 中配置 TUSHARE_TOKEN
-python shared/fetch_daily.py --start 20260608 --end 20260713 \
-  --stock-file 官方数据/B榜/股票样本_20260714.xlsx \
-  --out data/daily_hist_b_20260713.csv
-
-python v10/main_daily.py --input data/daily_hist_b_20260713.csv \
-  --target-date 20260713 --code-style keep
-
-python shared/make_submit.py --dir v10/out --zip v10/submit.zip
-python v10/local_eval.py --input data/daily_hist_b_20260713.csv
+python v10/main_daily.py --input data/daily_hist_b_official_20260714.csv \
+  --target-date 20260714 --code-style keep
+python v10/local_eval.py --input data/daily_hist_b_official_20260714.csv
 ```
+
+旧公开行情应急版见 `v9/`（0.5519 @20260713）。
 
 ---
 
@@ -104,9 +105,10 @@ python v10/local_eval.py --input data/daily_hist_b_20260713.csv
 
 | 版本 | 状态 | 分数 | 说明 |
 |:---:|:---:|:---:|:---|
-| v9 | **当前基线** | **0.5519** | 公开行情日更 |
+| v11 | **当前基线** | **0.5631** | Task1 提纯 @20260714；官方池 |
+| v9 | 冻结 | 0.5519 | 公开行情日更 @20260713 |
 | v5-B | 失败 | 0.3699 | 整迁 v5 |
-| v10 | 待线上 | — | 硬证据覆盖 + 真实资金流意图 |
+| v10 | 未单独上线 | — | 硬证据底座，已并入 v11 的 Task2 |
 
 ---
 

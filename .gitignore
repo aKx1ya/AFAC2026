@@ -10,12 +10,14 @@ venv/
 
 # 生成物 / 大文件
 data/*.csv
+data/*.xlsx
 v*/out/
 v*/out_*/
 v*/submit.zip
 v*/submit*.zip
 submit.zip
 *_intent_dual.py
+__pycache__/
 
 # IDE / OS
 .idea/
